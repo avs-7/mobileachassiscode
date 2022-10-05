@@ -1,0 +1,77 @@
+local Buttons = script.Parent:WaitForChild("Buttons")
+local Left = Buttons:WaitForChild("Left")
+local Right = Buttons:WaitForChild("Right")
+local Brake = Buttons:WaitForChild("Brake")
+local Gas = Buttons:WaitForChild("Gas")
+local Handbrake = Buttons:WaitForChild("Handbrake")
+
+if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
+	Buttons.Visible = true
+end
+local function LeftTurn(Touch, GPE)
+	if Touch.UserInputState == Enum.UserInputState.Begin then
+		_GSteerT = -1
+		_SteerL = true
+	else
+		if _SteerR then
+			_GSteerT = 1
+		else
+			_GSteerT = 0
+		end
+		_SteerL = false
+	end
+end
+Left.InputBegan:Connect(LeftTurn)
+Left.InputEnded:Connect(LeftTurn)
+--Left.InputChanged:Connect(LeftTurn)
+
+local function RightTurn(Touch, GPE)
+	if Touch.UserInputState == Enum.UserInputState.Begin then
+		_GSteerT = 1
+		_SteerR = true
+	else
+		if _SteerL then
+			_GSteerT = -1
+		else
+			_GSteerT = 0
+		end
+		_SteerR = false
+	end
+end
+Right.InputBegan:Connect(RightTurn)
+Right.InputEnded:Connect(RightTurn)
+--Right.InputChanged:Connect(RightTurn)
+
+local function TouchThrottle(input, GPE)
+	if input.UserInputState == Enum.UserInputState.Begin and _IsOn then
+		_GThrot = 1
+	else
+		_GThrot = _Tune.IdleThrottle/100
+	end
+end
+Gas.InputBegan:Connect(TouchThrottle)
+Gas.InputEnded:Connect(TouchThrottle)
+--Gas.InputChanged:Connect(TouchThrottle)
+
+local function TouchBrake(input, GPE)
+	if input.UserInputState == Enum.UserInputState.Begin then
+		_GBrake = 1
+	else
+		_GBrake = 0
+	end
+end
+Brake.InputBegan:Connect(TouchBrake)
+Brake.InputEnded:Connect(TouchBrake)
+--Brake.InputChanged:Connect(TouchBrake)
+
+local function TouchHandbrake(input, GPE)
+	if input.UserInputState == Enum.UserInputState.Begin then
+		_PBrake = not _PBrake
+	elseif input.UserInputState == Enum.UserInputState.End then
+		if car.DriveSeat.Velocity.Magnitude>5 then
+			_PBrake = false
+		end
+	end
+end
+Handbrake.InputBegan:Connect(TouchHandbrake)
+Handbrake.InputEnded:Connect(TouchHandbrake)
